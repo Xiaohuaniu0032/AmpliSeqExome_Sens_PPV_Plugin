@@ -154,6 +154,12 @@ my $final_vcf = "$outdir/$sample_name\.TSVC_variants.final.vcf";
 $cmd = "perl $Bin/Modify_Chr_Plus_Qual.pl $called_vcf $final_vcf";
 print O "\# get final vcf for $called_vcf file\n";
 print O "$cmd\n\n";
+
+
+# 合并INDEL/SNV 灵敏度 PPV
+my $summary = "$outdir/$sample_name\.InDel.SNV.Sens.PPV.txt";
+$cmd = "perl $Bin/Summary_Results.pl $Sens_PPV_Summary_file $snv_summary_outfile $sample_name $summary";
+print O "$cmd\n";
 close O;
 
 `chmod 755 $runsh`;

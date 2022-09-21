@@ -30,7 +30,7 @@ class AmpliSeqExome_Sens_PPV_Plugin(IonPlugin):
     net_location = self.startplugin_json['runinfo']['net_location']
     plugin_result_dir = self.startplugin_json['runinfo']['plugin'].get('results_dir')#
     tvc_dir  = self.startplugin_json['pluginconfig'].get('variant_caller_path')
-    tvc_name = os.path.basename(cons_dir.rstrip('/')) # 
+    tvc_name = os.path.basename(tvc_dir.rstrip('/')) # 
 
     abs_path = os.path.abspath(__file__)
     this_dir = os.path.dirname(abs_path)#
@@ -49,13 +49,33 @@ class AmpliSeqExome_Sens_PPV_Plugin(IonPlugin):
     with open("AmpliSeqExome_Sens_PPV_Plugin.html","w") as f:
       val = "variantCaller Result: %s" % (tvc_name)
       f.write("<html><body>" + val + "<br>")
-      '''
-      for aln in glob.glob('*.ClustalO.fasta'):
-        print(aln)
-        f.write('<a href="%s" target="_blank">%s</a><br>\n'
-              % (os.path.join(net_location,file_path,aln),aln))
-        f.write('</body></html>')
-      '''
+      full_ana_dir = os.path.join('/results/analysis',file_path)
+      f.write(full_ana_dir)
+      print(full_ana_dir)
+      #vcf = glob.glob('*/*.TSVC_variants.final.vcf')
+      #print(vcf)
+      
+      for final_vcf in glob.glob('*/*.TSVC_variants.final.vcf'):
+        barcode = os.path.basename(final_vcf).split('.')[0]
+        print(barcode,final_vcf)
+        f.write('<a href="%s" target="_blank">%s    %s</a><br>\n'
+              % (os.path.join(net_location,file_path,final_vcf),barcode,final_vcf))
+        
+      
+      for indel_summary in glob.glob('*/*.Sens_PPV_Summary.xls'):
+        barcode = os.path.basename(indel_summary).split('.')[0]
+        print(barcode,indel_summary)
+        f.write('<a href="%s" target="_blank">%s    %s</a><br>\n'
+              % (os.path.join(net_location,file_path,indel_summary),barcode,indel_summary))
+
+      for snv_summary in glob.glob('*/*.snv.sens.ppv.summary.xls'):
+        barcode = os.path.basename(snv_summary).split('.')[0]
+        print(barcode,snv_summary)
+        f.write('<a href="%s" target="_blank">%s    %s</a><br>\n'
+              % (os.path.join(net_location,file_path,indel_summary),barcode,snv_summary))
+
+      f.write('</body></html>')
+
     return True
 
 

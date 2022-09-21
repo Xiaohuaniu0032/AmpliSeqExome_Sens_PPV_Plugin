@@ -1,0 +1,3 @@
+Sample	VarType	TP	FP	FN	Sensitivity(%)	PPV(%)
+IonXpress_017	InDel	317	87	74	81.07	78.47
+IonXpress_017	SNV	15732	872	1425	91.69	94.75
