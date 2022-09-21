@@ -49,33 +49,52 @@ class AmpliSeqExome_Sens_PPV_Plugin(IonPlugin):
     with open("AmpliSeqExome_Sens_PPV_Plugin.html","w") as f:
       val = "variantCaller Result: %s" % (tvc_name)
       f.write("<html><body>" + val + "<br>")
-      full_ana_dir = os.path.join('/results/analysis',file_path)
-      f.write(full_ana_dir)
+      full_ana_dir = '/results/analysis' + file_path 
+      f.write(full_ana_dir+'\n')
       print(full_ana_dir)
-      #vcf = glob.glob('*/*.TSVC_variants.final.vcf')
-      #print(vcf)
       
       for final_vcf in glob.glob('*/*.TSVC_variants.final.vcf'):
         barcode = os.path.basename(final_vcf).split('.')[0]
         print(barcode,final_vcf)
-        f.write('<a href="%s" target="_blank">%s    %s</a><br>\n'
-              % (os.path.join(net_location,file_path,final_vcf),barcode,final_vcf))
+        final_vcf_basename = os.path.basename(final_vcf)
+        f.write('<a href="%s" target="_blank">%s</a><br>\n'
+              % (os.path.join(net_location,file_path,final_vcf),final_vcf_basename))
         
       
       for indel_summary in glob.glob('*/*.Sens_PPV_Summary.xls'):
         barcode = os.path.basename(indel_summary).split('.')[0]
         print(barcode,indel_summary)
-        f.write('<a href="%s" target="_blank">%s    %s</a><br>\n'
-              % (os.path.join(net_location,file_path,indel_summary),barcode,indel_summary))
+        indel_summary_basename = os.path.basename(indel_summary)
+        f.write('<a href="%s" target="_blank">%s</a><br>\n'
+              % (os.path.join(net_location,file_path,indel_summary),indel_summary_basename))
 
       for snv_summary in glob.glob('*/*.snv.sens.ppv.summary.xls'):
         barcode = os.path.basename(snv_summary).split('.')[0]
         print(barcode,snv_summary)
-        f.write('<a href="%s" target="_blank">%s    %s</a><br>\n'
-              % (os.path.join(net_location,file_path,indel_summary),barcode,snv_summary))
+        snv_summary_basename = os.path.basename(snv_summary)
+        f.write('<a href="%s" target="_blank">%s</a><br>\n'
+              % (os.path.join(net_location,file_path,indel_summary),snv_summary_basename))
 
       f.write('</body></html>')
 
+    with open("AmpliSeqExome_Sens_PPV_Plugin_block.html","w") as f:
+      f.write("<html><body>\n")
+      # read IonXpress_017.InDel.SNV.Sens.PPV.txt
+      for snv_indel_final in glob.glob('*/*.InDel.SNV.Sens.PPV.txt'):
+        barcode = os.path.basename(indel_summary).split('.')[0]
+        print(barcode,snv_indel_final)
+        fh = open(snv_indel_final,'r')
+        lines = fh.readlines()
+        f.write('<table border="1" cellspacing="0">')
+        for line in lines:
+          line_arr = line.split('\t')
+          f.write(' <tr>')
+          for item in line_arr:
+            val = '  <td>' + item + '</td>'
+            f.write(val)
+          f.write(' </tr>')
+        f.write('</table>')
+      f.write('</body></html>')
     return True
 
 
