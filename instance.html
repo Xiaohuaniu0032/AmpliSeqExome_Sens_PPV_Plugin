@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML>
+<html>
+<head>
+ <script type="text/javascript" src="/site_media/jquery/js/jquery-1.6.1.min.js"></script>
+
+ <style type="text/css">
+  #formwrap {
+   line-height: 2em;
+   background: #eef;
+   margin: 10px;
+   padding: 10px;
+   height: 500px;
+  }
+  body {
+   font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
+   font-size: 14px;
+  }
+  .center { margin-left:auto; margin-right:auto; }
+  .message { font-style: italic; padding: 0px 8px; }
+  .help {cursor:help; border-bottom: 1px dotted #A9A9A9}
+ </style>
+
+ <script>
+  $(function() {
+
+    var allowDefaultTargetsOverride = false;
+
+    if( allowDefaultTargetsOverride ) {
+      $('.resettargets').show();
+    } else {
+      $('.resettargets').hide();
+    }
+
+    var reportUrl = '/rundb/api/v1/results/'+TB_result+'/?format=json&noplugin=True';
+    var experimentUrl;
+    var easUrl;
+    var referenceID = "Unknown";
+    $.ajaxSetup({async: false});
+    $.get( reportUrl, function(data) {
+      referenceID = data.reference;
+      experimentUrl = data.experiment;
+      easUrl = data.eas;
+      // set up any config.html plan settings
+      $.each( data.config, function(key,val) {
+        try { $("#"+key).val(val); $("#"+key).attr('checked',(val=='Yes')); }
+        catch(e) {}
+      });
+    });
+    $('#referenceid').html(referenceID);
+
+    // attempt to get Plan details for default selection values - should be in EAS!
+    var planLibType = "";
+    if( experimentUrl != undefined && experimentUrl != null && experimentUrl != "" ) {
+      var planUrl;
+      $.get( experimentUrl+"?format=json", function(data) { planUrl = data.plan; } );
+      if( planUrl != undefined && planUrl != null && planUrl != "" ) {
+        $.get( planUrl+"?format=json", function(data) { planLibType = data.runType; });
+      }
+    }
+    // get majority of current report settings from EAS
+    var def_nuc = (planLibType == 'AMPS_RNA' || planLibType == 'RNA') ? 'RNA' : 'DNA';
+    var planBedFile = "";
+    if( easUrl != undefined && easUrl != null && easUrl != "" ) {
+      $.get( easUrl+"?format=json", function(data) {
+        planBedFile = data.targetRegionBedFile;
+      });
+    }
+
+    // load the barcode IDs
+    var barcodeNames = [];
+    $.get( easUrl, function(data) {
+      $.each( data.barcodedSamples, function(sample,sdata) {
+        try { barcodeNames = barcodeNames.concat( sdata.barcodes ) }
+        catch(e) {}
+      });
+    });
+
+    function loadCSV(csvFile) {
+      $('#LoadingMessage').text('Validating Contig Name Mapping file content...');
+      $('#bc2faMap').val("");
+      var numRecords = 0;
+      var dataString = ";";
+      var errmsg = "";
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var lines = this.result.split(/\r?\n/);
+        for( var n = 0; n < lines.length; ++n ) {
+          var line = $.trim(lines[n]);
+          if( line.length == 0 ) continue;
+          var fields = line.split(',').slice(0,2);
+          if( fields.length < 2 || fields[0] == "" || fields[1] == "" ) {
+            errmsg = "Missing data fields at line "+(n+1)+".";
+            break;
+          }
+          if( n == 0 ) continue;
+          var barcode = fields[0];
+          if( barcodeNames.includes(barcode) ) {
+            dataString += fields[0]+"="+fields[1]+";";
+            numRecords += 1;
+          } else {
+            errmsg = "Unknown/unused barcode '"+barcode+"' at line "+(n+1)+".";
+            break;
+          }
+        }
+        $('#LoadingMessage').text('');
+        if( numRecords == 0 ) {
+          errmsg = "No barcode to FASTA header mappings were defined.";
+        }
+        if( errmsg === "" ) {
+          $('#bc2faMap').val(dataString);
+          launchRun();
+        } else {
+          alert("An error occurred while loading from "+csvfile.name+":\n"+errmsg+"\nRefer to the Description and Usage Notes for file format details.");
+        }
+      };
+      reader.onerror = function(e) {
+        $('#LoadingMessage').text('');
+          alert("An error occurred while loading from "+csvfile.name+":\nFile is missing or not text formatted.");
+      };
+      reader.readAsText(csvFile);
+    }
+
+    
+
+    function populateVariantCallerList(selectorID) {
+      if( selectorID == '' ) return;
+      $('#'+selectorID).empty();
+      var nItems = 0;
+      var runtypeUrl = '/rundb/api/v1/results/'+TB_result+'/pluginresults/?format=json';
+      $.ajaxSetup({async:false});
+      $.get( runtypeUrl, function(data) {
+        $.each( data, function(intIndex,plugin) {
+          if( plugin['Name'] == "variantCaller" ) {
+            pluginPath = plugin['Path']
+            var pluginID = plugin['Name']+"_out."+plugin['id'];
+            $('#'+selectorID).append("<option value='"+pluginPath+"'>"+pluginID+"</option>");
+            ++nItems;
+          }
+        });
+      });
+      if( nItems ) {
+        orderSelectorList(selectorID);
+      } else {
+        $('#'+selectorID).append("<option value=''>None available</option>");
+      }
+    }
+
+    var refBedType = '/unmerged/detail/';
+
+    function targetNameFromURL(bedURL) {
+      var i = bedURL.lastIndexOf(refBedType);
+      if( i >= 0 ) {
+        bedURL = bedURL.substr(i+refBedType.length);
+      } else {
+        i = bedURL.lastIndexOf('/');
+        if( i >= 0 ) bedURL = bedURL.substr(i+1);
+      }
+      if( bedURL.substr(0,7) == 'example' ) return "";
+      i = bedURL.lastIndexOf('.bed');
+      if( i > 0 ) return bedURL.substr(0,i);
+      return bedURL;
+    }
+
+    // For each selector populated by this function a list of items and selected reference is recorded
+    // for performance by avoiding multiple API queries to poplate and sort these lists.
+    var selectRefs = {};
+    var selectLst = {};
+
+    // Returns true if the list was created or changed. Returns false if no change was necessary.
+    function populateTargetsList(refID,selectorID,firstItem) {
+      if( selectorID == '' || selectRefs[selectorID] == refID ) return false;
+      selectRefs[selectorID] = refID;
+      $('#'+selectorID).empty();
+      var lstID = selectorID+"@"+refID;
+      if( !selectLst[lstID] ) {
+        var refBedURL = '/rundb/api/v1/content/?format=json&limit=0&publisher__name=BED&path__startswith=/'+refID+refBedType;
+        $.get( refBedURL, function(data) {
+          $.each( data.objects, function(intIndex,result) {
+            var targfile = result.file;
+            var selName = targetNameFromURL(targfile);
+            if( selName != "" && !result.meta.hotspot ) {
+              $('#'+selectorID).append("<option value='"+targfile+"'>"+selName+"</option>");
+            }
+          });
+        });
+        orderSelectorList(selectorID,firstItem);
+        // ensure reference with no targets get 'none' selection
+        if( $('#'+selectorID+' option').size() == 0 ) {
+          $('#'+selectorID).append("<option value=''>None</option>");
+        }
+        selectLst[lstID] = $('#'+selectorID+' option');
+      } else {
+        $('#'+selectorID).append(selectLst[lstID]);
+        if( $('#'+selectorID+' option').size() > 0 )
+          $('#'+selectorID+' option')[0].selected = true;
+      }
+      return true;
+    }
+
+    function orderSelectorList(selectorID,firstItem) {
+      var lst = $('#'+selectorID+' option');
+      lst.sort(function(a,b) {
+        var at = parseInt(a.text.replace(/.*\./,""));
+        var bt = parseInt(b.text.replace(/.*\./,""));
+        if( at < bt ) return 1;
+        if( at > bt ) return -1;
+        return 0;
+      });
+      $('#'+selectorID).empty();
+      if( firstItem ) {
+        $('#'+selectorID).append("<option value=''>"+firstItem+"</option>");
+      }
+      $('#'+selectorID).append(lst);
+      if( $('#'+selectorID+' option').size() > 0 )
+        $('#'+selectorID+' option')[0].selected = true;
+    }
+
+    function invalidNumRange(strval,minval,maxval) {
+      var floatRegex = /^-?\d*(\.)?[0-9]*$/;
+      var val = parseFloat(strval);
+      return !floatRegex.test(strval) || strval == "." || val < minval || val > maxval;
+    }
+
+    populateTargetsList(referenceID,'targetregions','None');
+    var deadTarget = 0;
+    if( planBedFile !== "" ) {
+      if( $("#barcodetargets option[value='"+planBedFile+"']").length == 0 ) ++deadTarget;
+      $("#targetregions").val(planBedFile);
+    }
+    populateVariantCallerList('variant_caller_path')
+ 
+    $('#postbutton').click( function() {
+      // validate the simple options first
+      var defTargetsID = $('#targetregions option:selected').text();
+      $('#targetregions_id').val(defTargetsID);
+      var tvcp = $("#variant_caller_path").val()
+      if( !tvcp ) {
+        alert("This plugin cannot be run without a valid variantCaller plugin result run and selected.");
+        return false;
+      }
+      launchRun();
+      return false;  // return state not important here
+    });
+    
+    
+    function launchRun() {
+      obj = $('#generateConsensus').serializeObject();
+      // insert barcode selection table if built by plugin.py
+      //obj.barcodetable = parent.TB_plugin_functions.get_plugin_barcodetable();
+      pluginAPIJSON = { "plugin" : [TB_plugin.fields.name], "pluginconfig" : obj };
+      pluginAPIJSON = JSON.stringify(pluginAPIJSON);
+      pluginURL = "/rundb/api/v1/results/" + TB_result + "/plugin/";
+      $.ajax({
+       type: "POST",
+       url: pluginURL,
+       async: false,
+       contentType: "application/json; charset=utf-8",
+       success: function(data)
+       {
+        $("#json_result").html('<div style="text-align: center;"><img src="/site_media/jquery/colorbox/images/loading.gif" alt="Running Plugin" style="float:center"></img><p>Running the Plugin... Check generateConsensus.html in the Plugin Summary</p></div>');
+        setTimeout("parent.$.fn.colorbox.close()",2000);
+       },
+       data: pluginAPIJSON,
+       dataType: "json"
+      });
+    }
+
+    $.fn.serializeObject = function() {
+     var o = {};
+     var a = this.serializeArray();
+     $.each(a,
+      function() {
+       if (o[this.name] != null) {
+        if (!o[this.name].push) {
+         o[this.name] = [o[this.name]];
+        }
+        o[this.name].push(this.value || '');
+       } else {
+        o[this.name] = this.value || '';
+       }
+      });
+     return o;
+    };
+
+  });
+ </script>
+</head>
+
+<body>
+ <form id="generateConsensus" name="generateConsensus">
+  <div style="text-align:center">
+   <h1>AmpliSeqExome_Sens_PPV Plugin</h1>
+   <h3>Stat AmpliSeq Exome Panel's Sensitivity and PPV</h3>
+  </div>
+
+   <table class="center" cellpadding="5px">
+    <tr> 
+     <td><span class="help" title="Use which variantCaller_out.xxx">variantCaller Run:</span></td>
+     <td><select id="variant_caller_path" name="variant_caller_path"></select></td>
+    </tr> 
+   </table>
+ </form>
+ <br/><br/>
+
+   <div align="center" id="json_result">
+    <input id="postbutton" type="submit" value="Submit">
+    <br/><br/>
+    <span id="LoadingMessage" class="message"></span>
+   </div>
+   
+   <div align="left">
+    <h3>Description and Usage Notes</h3>
+   </div>
+</body>
+</html>
+

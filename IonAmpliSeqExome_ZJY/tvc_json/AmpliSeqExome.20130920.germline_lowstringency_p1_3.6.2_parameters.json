@@ -1,0 +1,58 @@
+{
+    "long_indel_assembler": {
+        "short_suffix_match": 5, 
+        "min_indel_size": 4, 
+        "min_var_count": 5, 
+        "min_var_freq": 0.15, 
+        "kmer_len": 19, 
+        "max_hp_length": 8, 
+        "relative_strand_bias": 0.8
+    }, 
+    "meta": {
+        "tvcargs": "tvc"
+    }, 
+    "torrent_variant_caller": {
+        "snp_min_allele_freq": 0.1, 
+        "snp_strand_bias": 0.99, 
+        "hotspot_min_coverage": 5, 
+        "hotspot_min_cov_each_strand": 0, 
+        "hotspot_min_allele_freq": 0.1, 
+        "snp_min_variant_score": 15.0, 
+        "snp_beta_bias": 1000.0, 
+        "hotspot_strand_bias": 0.99, 
+        "hp_max_length": 25, 
+        "filter_insertion_predictions": 0.25, 
+        "indel_min_variant_score": 20.0, 
+        "indel_beta_bias": 1000.0, 
+        "indel_min_coverage": 5, 
+        "heavy_tailed": 3, 
+        "outlier_probability": 0.01, 
+        "data_quality_stringency": 20.0, 
+        "snp_min_cov_each_strand": 0, 
+        "hotspot_min_variant_score": 15.0, 
+        "indel_strand_bias": 0.95, 
+        "tvc_parameters_version": "ampliseq_exome_proton-3.6.66827", 
+        "downsample_to_coverage": 400, 
+        "filter_unusual_predictions": 0.25, 
+        "indel_min_allele_freq": 0.1, 
+        "do_snp_realignment": 1, 
+        "prediction_precision": 1.0, 
+        "indel_min_cov_each_strand": 1, 
+        "filter_deletion_predictions": 0.25, 
+        "suppress_recalibration": 0, 
+        "snp_min_coverage": 5, 
+        "hotspot_beta_bias": 1000.0
+    }, 
+    "freebayes": {
+        "gen_min_coverage": 6, 
+        "allow_mnps": 0, 
+        "read_max_mismatch_fraction": 1.0, 
+        "allow_snps": 1, 
+        "allow_indels": 1, 
+        "min_mapping_qv": 4, 
+        "gen_min_alt_allele_freq": 0.15, 
+        "read_mismatch_limit": 10, 
+        "min_base_qv": 4, 
+        "gen_min_indel_alt_allele_freq": 0.15
+    }
+}
