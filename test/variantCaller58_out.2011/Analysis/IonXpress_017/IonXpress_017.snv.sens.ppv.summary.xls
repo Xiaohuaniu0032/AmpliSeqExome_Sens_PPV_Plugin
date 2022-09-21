@@ -1,0 +1,9 @@
+################# Stat SNV Sensitivity ######################
+call_num	not_call_num	all_num	sensitivity
+15732	1425	17157	91.69
+################# Stat SNV PPV ######################
+tp_num	fp_num	all_num	ppv
+15732	872	16604	94.75
+####################### Summary ###########################
+SNV_Sensitivity: 91.69% 
+SNV_PPV        : 94.75% 

@@ -1,0 +1,17 @@
+######################## Stat Senesitivity ########################
+###[This Var will be skipped for multi alt allele] => chr12	14720554	rs147342083	GGCA	G,TGCA	.	PASS	platforms=5;platformnames=BGISEQ-500,MGISEQ-2000,NextSeq-CN500,NextSeq550Dx,NovaSeq6000;callsets=14;callsetnames=BGISEQ-500_HJ-1,BGISEQ-500_HJ-2,BGISEQ-500_HJ-3,MGISEQ-2000_HJ-1,MGISEQ-2000_HJ-2,MGISEQ-2000_HJ-3,NextSeq-CN500_HJ-1,NextSeq-CN500_HJ-2,NextSeq-CN500_HJ-3,NextSeq550Dx_HJ-1,NextSeq550Dx_HJ-2,NextSeq550Dx_HJ-3,NovaSeq6000_HJ-1,NovaSeq6000_HJ-3;filt=0	GT:DP:ADALL:AD:GQ	1/2:978:3,458:3,458:99
+
+###[This Var will be skipped for multi alt allele] => chr5	175811094	rs56989856	C	CAT,CGT	.	PASS	platforms=5;platformnames=BGISEQ-500,MGISEQ-2000,NextSeq-CN500,NextSeq550Dx,NovaSeq6000;callsets=15;callsetnames=BGISEQ-500_HJ-1,BGISEQ-500_HJ-2,BGISEQ-500_HJ-3,MGISEQ-2000_HJ-1,MGISEQ-2000_HJ-2,MGISEQ-2000_HJ-3,NextSeq-CN500_HJ-1,NextSeq-CN500_HJ-2,NextSeq-CN500_HJ-3,NextSeq550Dx_HJ-1,NextSeq550Dx_HJ-2,NextSeq550Dx_HJ-3,NovaSeq6000_HJ-1,NovaSeq6000_HJ-2,NovaSeq6000_HJ-3;filt=0	GT:DP:ADALL:AD:GQ	1/2:1012:0,543:0,543:99
+
+###[This Var will be skipped for multi alt allele] => chr7	64169019	rs201020174	G	A,GAA	.	PASS	platforms=5;platformnames=BGISEQ-500,MGISEQ-2000,NextSeq-CN500,NextSeq550Dx,NovaSeq6000;callsets=13;callsetnames=BGISEQ-500_HJ-1,BGISEQ-500_HJ-2,BGISEQ-500_HJ-3,MGISEQ-2000_HJ-1,MGISEQ-2000_HJ-2,MGISEQ-2000_HJ-3,NextSeq-CN500_HJ-1,NextSeq-CN500_HJ-2,NextSeq-CN500_HJ-3,NextSeq550Dx_HJ-1,NovaSeq6000_HJ-1,NovaSeq6000_HJ-2,NovaSeq6000_HJ-3;filt=0	GT:DP:ADALL:AD:GQ	1/2:759:8,356:8,356:99
+
+indel_called_num	indel_not_called_num	indel_total_num	indel_sensitivity(%)
+317	74	391	81.07
+
+
+
+
+######################## Stat PPV ########################
+Out of YH 27M Target InDel Num: 5
+TP_indel_num	FP_indel_num	TP_FP_indel_num	PPV
+317	87	404	78.47
