@@ -105,9 +105,9 @@ $cmd = "perl $Bin/scripts/Check_PPV_TVC_Detail.pl $PPV_file $PPV_TVC_detail_outf
 print O "$cmd\n\n";
 
 # 输出PPV MLLD/RBI.
-my $tp_fp_distri = "$outdir/$sample_name\.MLLD.RBI.plot.txt";
-$cmd = "perl $Bin/Classify_FP_by_MLLD_RBI.pl $PPV_TVC_detail_outfile $tp_fp_distri";
-print O "$cmd\n\n";
+#my $tp_fp_distri = "$outdir/$sample_name\.MLLD.RBI.plot.txt";
+#$cmd = "perl $Bin/Classify_FP_by_MLLD_RBI.pl $PPV_TVC_detail_outfile $tp_fp_distri";
+#print O "$cmd\n\n";
 
 # 画图检查FP位点MLLD/RBI分布
 #print O "cd $outdir\n";
