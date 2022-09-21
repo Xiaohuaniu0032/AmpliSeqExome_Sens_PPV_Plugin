@@ -28,12 +28,12 @@ class AmpliSeqExome_Sens_PPV_Plugin(IonPlugin):
 
   def launch(self,data=None):
     net_location = self.startplugin_json['runinfo']['net_location']
-    plugin_result_dir = self.startplugin_json['runinfo']['plugin'].get('results_dir') #插件输出目录
+    plugin_result_dir = self.startplugin_json['runinfo']['plugin'].get('results_dir')#
     tvc_dir  = self.startplugin_json['pluginconfig'].get('variant_caller_path')
     tvc_name = os.path.basename(cons_dir.rstrip('/')) # 
 
     abs_path = os.path.abspath(__file__)
-    this_dir = os.path.dirname(abs_path) # 当前脚本目录
+    this_dir = os.path.dirname(abs_path)#
     
     print "input variantCaller dir is: %s" % (tvc_dir)
     print "output dir is: %s" % (plugin_result_dir)
