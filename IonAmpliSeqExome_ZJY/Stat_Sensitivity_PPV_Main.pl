@@ -110,9 +110,9 @@ $cmd = "perl $Bin/Classify_FP_by_MLLD_RBI.pl $PPV_TVC_detail_outfile $tp_fp_dist
 print O "$cmd\n\n";
 
 # 画图检查FP位点MLLD/RBI分布
-print O "cd $outdir\n";
-$cmd = "Rscript $Bin/TP_FP_MLLD_RBI.R $tp_fp_distri $sample_name";
-print O "$cmd\n\n";
+#print O "cd $outdir\n";
+#$cmd = "Rscript $Bin/TP_FP_MLLD_RBI.R $tp_fp_distri $sample_name";
+#print O "$cmd\n\n";
 
 # 输出热点DP/FDP等深度信息
 my $depth_summary_file = "$outdir/$sample_name\.HS.InDel.Depth.Summary.xls";
@@ -138,9 +138,9 @@ print O "$cmd\n\n";
 
 
 # 根据TVC depth.txt统计热点INDEL深度
-my $hs_depth_txt = "$outdir/$sample_name\.hs.depth.txt";
-$cmd = "perl $Bin/Check_Hotspot_Depth.pl $depth_file $sample_name $hs_depth_txt";
-print O "$cmd\n\n";
+#my $hs_depth_txt = "$outdir/$sample_name\.hs.depth.txt";
+#$cmd = "perl $Bin/Check_Hotspot_Depth.pl $depth_file $sample_name $hs_depth_txt";
+#print O "$cmd\n\n";
 
 # 根据samtools depth查看SNV FN位点原始深度
 #my $root_dir = dirname($outdir);
