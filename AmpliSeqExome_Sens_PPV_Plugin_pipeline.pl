@@ -26,7 +26,7 @@ for my $vcf (@vcf){
 
 
 	print "Start process $barcode ...\n";
-	#`sh $outdir/$barcode/run\_$barcode\.sh`;
+	`sh $outdir/$barcode/run\_$barcode\.sh`;
 	print "End process $barcode ...\n";
 }
 

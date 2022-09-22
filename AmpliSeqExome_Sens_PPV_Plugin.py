@@ -50,7 +50,7 @@ class AmpliSeqExome_Sens_PPV_Plugin(IonPlugin):
       val = "variantCaller Result: %s" % (tvc_name)
       f.write("<html><body>" + val + "<br>")
       full_ana_dir = '/results/analysis' + file_path 
-      f.write(full_ana_dir+'\n')
+      f.write(full_ana_dir+'<br>')
       print(full_ana_dir)
       
       for final_vcf in glob.glob('*/*.TSVC_variants.final.vcf'):
